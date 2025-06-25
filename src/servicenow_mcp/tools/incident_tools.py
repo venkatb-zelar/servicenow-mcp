@@ -74,6 +74,7 @@ class ListIncidentsParams(BaseModel):
     state: Optional[str] = Field(None, description="Filter by incident state")
     assigned_to: Optional[str] = Field(None, description="Filter by assigned user")
     category: Optional[str] = Field(None, description="Filter by category")
+    number: Optional[str] = Field(None, description="Filter by incident number")
     query: Optional[str] = Field(None, description="Search query for incidents")
 
 
@@ -484,6 +485,8 @@ def list_incidents(
         filters.append(f"assigned_to={params.assigned_to}")
     if params.category:
         filters.append(f"category={params.category}")
+    if params.number:
+        filters.append(f"number={params.number}")
     if params.query:
         filters.append(f"short_descriptionLIKE{params.query}^ORdescriptionLIKE{params.query}")
     
