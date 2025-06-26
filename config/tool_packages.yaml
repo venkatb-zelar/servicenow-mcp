@@ -153,6 +153,7 @@ full:
   - add_comment
   - resolve_incident
   - list_incidents
+  - get_incident
   # Catalog (Core)
   - list_catalogs
   - list_catalog_items
