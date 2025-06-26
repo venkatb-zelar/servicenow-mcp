@@ -79,8 +79,7 @@ class ListIncidentsParams(BaseModel):
 class GetIncidentParams(BaseModel):
     """Parameters for fetching an incident by its number or sys_id."""
 
-    incident_number: str = Field(None, description="The number of the incident to fetch")
-    sys_id: str = Field(None, description="The sys_id of the incident to fetch")
+    incident_id: str = Field(..., description="Incident ID or sys_id")
 
 
 class IncidentResponse(BaseModel):
@@ -381,22 +380,16 @@ def get_incident(
     api_url = f"{config.api_url}/table/incident"
 
     # Build query parameters
-    if params.incident_number:
-        query_params = {
-            "sysparm_query": f"number={params.incident_number}",
-            "sysparm_limit": 1,
-            "sysparm_display_value": "true",
-            "sysparm_exclude_reference_link": "true",
-        }
-    elif params.sys_id:
-        query_params = {
-            "sysparm_query": f"sys_id={params.sys_id}",
-            "sysparm_limit": 1,
-            "sysparm_display_value": "true",
-            "sysparm_exclude_reference_link": "true",
-        }
+    query_params = {
+        "sysparm_query": f"number={params.incident_id}",
+        "sysparm_limit": 1,
+        "sysparm_display_value": "true",
+        "sysparm_exclude_reference_link": "true",
+    }
+       
  
-        incident_identifier = params.incident_number or params.sys_id
+ 
+    incident_identifier = params.incident_number or params.sys_id
     # Make request
     try:
         response = requests.get(
