@@ -174,6 +174,7 @@ The default `config/tool_packages.yaml` includes the following role-based packag
 3. **add_comment** - Add a comment to an incident in ServiceNow
 4. **resolve_incident** - Resolve an incident in ServiceNow
 5. **list_incidents** - List incidents from ServiceNow
+6. **get_incident** - Get Detailed information about specific incident from ServiceNow
 
 #### Service Catalog Tools
 
@@ -308,6 +309,7 @@ Below are some example natural language queries you can use with Claude to inter
 - "Resolve incident INC0010001 with a note that the server was restarted"
 - "List all high priority incidents assigned to the Network team"
 - "List all active P1 incidents assigned to the Network team."
+- "Get incident of INC0010001"
 
 #### Service Catalog Examples
 - "Show me all items in the service catalog"
