@@ -377,7 +377,32 @@ def get_incident(
     Returns:
         Dictionary with the incident details.
     """
-    api_url = f"{config.api_url}/table/incident"
+
+
+    incident_id = params.incident_id
+    if len(incident_id) == 32 and all(c in "0123456789abcdef" for c in incident_id):
+        # This is likely a sys_id
+        api_url = f"{config.api_url}/table/incident/{incident_id}"
+        query_params = {
+        # "sysparm_query": f"number={params.incident_id}",
+        "sysparm_limit": 1,
+        "sysparm_display_value": "true",
+        "sysparm_exclude_reference_link": "true",
+    }
+    else:
+        # This is likely an incident number
+        # First, we need to get the sys_id
+        # tr
+        #     query_url = f"{config.api_url}/table/incident"
+        #     query_params = {
+        #         "sysparm_query": f"number={incident_id}",
+        #         "sysparm_limit": 1,
+        #     }
+
+
+
+
+     api_url = f"{config.api_url}/table/incident"
 
     # Build query parameters
     query_params = {
