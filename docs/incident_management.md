@@ -41,8 +41,7 @@ Retrieves a specific incident from ServiceNow  number or sys_id.
 **Resource Name:** `incident`
 
 **Parameters:**
-- `incident_number` (string,optional): fetches incident by incident number
-- `sys_id`  (string,optional): fetches incident by  sys_id
+- `incident_id` (string, required): Incident ID or sys_id
 
 **Example:**
 ```python
