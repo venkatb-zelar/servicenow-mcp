@@ -333,6 +333,7 @@ Below are some example natural language queries you can use with Claude to inter
 - "Resolve incident INC0010001 with a note that the server was restarted"
 - "List all high priority incidents assigned to the Network team"
 - "List all active P1 incidents assigned to the Network team."
+- "Get incident of INC0010001"
 
 #### Service Catalog Examples
 - "Show me all items in the service catalog"
