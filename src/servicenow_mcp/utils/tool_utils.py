@@ -366,7 +366,7 @@ def get_tool_definitions(
             get_incident_tool,
             GetIncidentParams,
             str,  # Expects JSON string
-            "Get specific incident details by number or sys_id",
+            "Get detailed information about a specific incident",
             "json",  # Tool returns list/dict
         ),
         "get_catalog_item": (

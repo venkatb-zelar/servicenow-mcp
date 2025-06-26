@@ -174,6 +174,7 @@ The default `config/tool_packages.yaml` includes the following role-based packag
 3. **add_comment** - Add a comment to an incident in ServiceNow
 4. **resolve_incident** - Resolve an incident in ServiceNow
 5. **list_incidents** - List incidents from ServiceNow
+6. **get_incident** - Get Detailed information about specific incident from ServiceNow
 
 #### Service Catalog Tools
 
