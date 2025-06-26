@@ -367,7 +367,7 @@ def add_comment(
 def get_incident(
     config: ServerConfig,
     auth_manager: AuthManager,
-    params: GetIncidentByNumberParams,
+    params: GetIncidentParams,
 ) -> dict:
     """
     Fetch a single incident from ServiceNow by its number or sys_id.
