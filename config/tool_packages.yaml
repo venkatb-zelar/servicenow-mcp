@@ -15,6 +15,7 @@ service_desk:
   - add_comment
   - resolve_incident
   - list_incidents
+  - get_incident
   # User Lookup
   - get_user
   - list_users
