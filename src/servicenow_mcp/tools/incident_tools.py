@@ -389,7 +389,7 @@ def get_incident(
        
  
  
-    incident_identifier = params.incident_number or params.sys_id
+    # incident_identifier = params.incident_number or params.sys_id
     # Make request
     try:
         response = requests.get(
@@ -406,7 +406,7 @@ def get_incident(
         if not result:
             return {
                 "success": False,
-                "message": f"Incident not found: {incident_identifier }",
+                "message": f"Incident not found: {params.incident_id }",
             }
 
         incident_data = result[0]
@@ -431,7 +431,7 @@ def get_incident(
  
         return {
             "success": True,
-            "message": f"Incident {incident_identifier} found",
+            "message": f"Incident {params.incident_id} found",
             "incident": incident,
         }
 
