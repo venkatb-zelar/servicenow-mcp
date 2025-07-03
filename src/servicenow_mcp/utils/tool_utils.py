@@ -122,6 +122,7 @@ from servicenow_mcp.tools.incident_tools import (
     ListIncidentsParams,
     ResolveIncidentParams,
     UpdateIncidentParams,
+    GetIncidentParams,
 )
 from servicenow_mcp.tools.incident_tools import (
     add_comment as add_comment_tool,
@@ -134,6 +135,9 @@ from servicenow_mcp.tools.incident_tools import (
 )
 from servicenow_mcp.tools.incident_tools import (
     resolve_incident as resolve_incident_tool,
+)
+from servicenow_mcp.tools.incident_tools import (
+    get_incident as get_incident_tool,
 )
 from servicenow_mcp.tools.incident_tools import (
     update_incident as update_incident_tool,
@@ -402,6 +406,13 @@ def get_tool_definitions(
             ListCatalogItemsParams,
             str,  # Expects JSON string
             "List service catalog items.",
+            "json",  # Tool returns list/dict
+        ),
+        "get_incident": (
+            get_incident_tool,
+            GetIncidentParams,
+            str,  # Expects JSON string
+            "Get detailed information about a specific incident",
             "json",  # Tool returns list/dict
         ),
         "get_catalog_item": (

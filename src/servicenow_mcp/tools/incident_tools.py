@@ -68,13 +68,19 @@ class ResolveIncidentParams(BaseModel):
 
 class ListIncidentsParams(BaseModel):
     """Parameters for listing incidents."""
-    
+
     limit: int = Field(10, description="Maximum number of incidents to return")
     offset: int = Field(0, description="Offset for pagination")
     state: Optional[str] = Field(None, description="Filter by incident state")
     assigned_to: Optional[str] = Field(None, description="Filter by assigned user")
     category: Optional[str] = Field(None, description="Filter by category")
     query: Optional[str] = Field(None, description="Search query for incidents")
+
+
+class GetIncidentParams(BaseModel):
+    """Parameters for fetching an incident by its number or sys_id."""
+
+    incident_id: str = Field(..., description="Incident ID or sys_id")
 
 
 class IncidentResponse(BaseModel):
@@ -359,6 +365,105 @@ def add_comment(
         )
 
 
+def get_incident(
+    config: ServerConfig,
+    auth_manager: AuthManager,
+    params: GetIncidentParams,
+) -> dict:
+    """
+    Fetch a single incident from ServiceNow by its number or sys_id.
+
+    Args:
+        config: Server configuration.
+        auth_manager: Authentication manager.
+        params: Parameters for fetching the incident.
+
+    Returns:
+        Dictionary with the incident details.
+    """
+    # Determine if incident_id is a number or sys_id
+    incident_id = params.incident_id
+    if len(incident_id) == 32 and all(c in "0123456789abcdef" for c in incident_id):
+        # This is likely a sys_id
+        api_url = f"{config.api_url}/table/incident/{incident_id}"
+        query_params = {
+            "sysparm_display_value": "true",
+            "sysparm_exclude_reference_link": "true",
+        }
+    else:
+        # This is likely an incident number
+        api_url = f"{config.api_url}/table/incident"
+        query_params = {
+            "sysparm_query": f"number={incident_id}",
+            "sysparm_limit": 1,
+            "sysparm_display_value": "true",
+            "sysparm_exclude_reference_link": "true",
+        }
+
+    # Make request
+    try:
+        response = requests.get(
+            api_url,
+            params=query_params,
+            headers=auth_manager.get_headers(),
+            timeout=config.timeout,
+        )
+        response.raise_for_status()
+
+        data = response.json()
+
+        # Handle response based on lookup type
+        if len(incident_id) == 32 and all(c in "0123456789abcdef" for c in incident_id):
+            # Direct sys_id lookup returns single object
+            result = data.get("result")
+            if not result:
+                return {
+                    "success": False,
+                    "message": f"Incident not found: {incident_id}",
+                }
+            incident_data = result
+        else:
+            # Number lookup returns array
+            result = data.get("result", [])
+            if not result:
+                return {
+                    "success": False,
+                    "message": f"Incident not found: {incident_id}",
+                }
+            incident_data = result[0]
+
+        assigned_to = incident_data.get("assigned_to")
+        if isinstance(assigned_to, dict):
+            assigned_to = assigned_to.get("display_value")
+
+        incident = {
+            "sys_id": incident_data.get("sys_id"),
+            "number": incident_data.get("number"),
+            "short_description": incident_data.get("short_description"),
+            "description": incident_data.get("description"),
+            "state": incident_data.get("state"),
+            "priority": incident_data.get("priority"),
+            "assigned_to": assigned_to,
+            "category": incident_data.get("category"),
+            "subcategory": incident_data.get("subcategory"),
+            "created_on": incident_data.get("sys_created_on"),
+            "updated_on": incident_data.get("sys_updated_on"),
+        }
+
+        return {
+            "success": True,
+            "message": f"Incident {incident_id} found",
+            "incident": incident,
+        }
+
+    except requests.RequestException as e:
+        logger.error(f"Failed to fetch incident: {e}")
+        return {
+            "success": False,
+            "message": f"Failed to fetch incident: {str(e)}",
+        }
+
+
 def resolve_incident(
     config: ServerConfig,
     auth_manager: AuthManager,
@@ -475,7 +580,7 @@ def list_incidents(
         "sysparm_display_value": "true",
         "sysparm_exclude_reference_link": "true",
     }
-    
+
     # Add filters
     filters = []
     if params.state:
@@ -486,10 +591,10 @@ def list_incidents(
         filters.append(f"category={params.category}")
     if params.query:
         filters.append(f"short_descriptionLIKE{params.query}^ORdescriptionLIKE{params.query}")
-    
+
     if filters:
         query_params["sysparm_query"] = "^".join(filters)
-    
+
     # Make request
     try:
         response = requests.get(
@@ -499,16 +604,16 @@ def list_incidents(
             timeout=config.timeout,
         )
         response.raise_for_status()
-        
+
         data = response.json()
         incidents = []
-        
+
         for incident_data in data.get("result", []):
             # Handle assigned_to field which could be a string or a dictionary
             assigned_to = incident_data.get("assigned_to")
             if isinstance(assigned_to, dict):
                 assigned_to = assigned_to.get("display_value")
-            
+
             incident = {
                 "sys_id": incident_data.get("sys_id"),
                 "number": incident_data.get("number"),
@@ -523,17 +628,13 @@ def list_incidents(
                 "updated_on": incident_data.get("sys_updated_on"),
             }
             incidents.append(incident)
-        
+
         return {
             "success": True,
             "message": f"Found {len(incidents)} incidents",
-            "incidents": incidents
+            "incidents": incidents,
         }
-        
+
     except requests.RequestException as e:
         logger.error(f"Failed to list incidents: {e}")
-        return {
-            "success": False,
-            "message": f"Failed to list incidents: {str(e)}",
-            "incidents": []
-        }
+        return {"success": False, "message": f"Failed to list incidents: {str(e)}", "incidents": []}

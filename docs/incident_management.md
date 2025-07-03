@@ -34,14 +34,15 @@ for incident in incidents:
     print(f"{incident.number}: {incident.short_description}")
 ```
 
-### Get Incident
+### get_incident
 
-Retrieves a specific incident from ServiceNow by ID or number.
+Retrieves a specific incident from ServiceNow  number or sys_id.
 
 **Resource Name:** `incident`
 
 **Parameters:**
-- `incident_id` (string): Incident ID or sys_id
+- `incident_number` (string,optional): fetches incident by incident number
+- `sys_id`  (string,optional): fetches incident by  sys_id
 
 **Example:**
 ```python
